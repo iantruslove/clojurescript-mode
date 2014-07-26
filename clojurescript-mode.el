@@ -114,7 +114,7 @@
 
 (defun clojurescript-repl-set-ns ()
   (comint-send-string clojurescript-repl-buffer-name
-                      (format "(in-ns '%s)" (clojurescript-find-ns))))
+                      (format "(in-ns '%s)\n" (clojurescript-find-ns))))
 
 (defvar clojurescript-mode-map
   (let ((map (make-sparse-keymap)))
