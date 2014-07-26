@@ -12,8 +12,8 @@
 
 ;;; Commentary:
 
-;; Provides an REPL to the
-;; ClojureScript language. (http://github.com/clojure/clojurescript) using
+;; Provides an REPL to the ClojureScript language
+;; (http://github.com/clojure/clojurescript) using
 ;; lein cljsbuild.
 
 ;; For information on how to start up the REPL correctly see
@@ -80,9 +80,45 @@
     (inferior-cljs (cljs-repl-command)))
   (pop-to-buffer clojurescript-repl-buffer-name))
 
+;; Stolen from clojure-mode.el:
+(defconst clojurescript-namespace-name-regex
+  (rx line-start
+      (zero-or-more whitespace)
+      "("
+      (zero-or-one (group (regexp "clojure.core/")))
+      (zero-or-one (submatch "in-"))
+      "ns"
+      (zero-or-one "+")
+      (one-or-more (any whitespace "\n"))
+      (zero-or-more (or (submatch (zero-or-one "#")
+                                  "^{"
+                                  (zero-or-more (not (any "}")))
+                                  "}")
+                        (zero-or-more "^:"
+                                      (one-or-more (not (any whitespace)))))
+                    (one-or-more (any whitespace "\n")))
+      ;; why is this here? oh (in-ns 'foo) or (ns+ :user)
+      (zero-or-one (any ":'"))
+      (group (one-or-more (not (any "()\"" whitespace))) word-end)))
+
+;; Stolen from clojure-mode.el
+(defun clojurescript-find-ns ()
+  "Find the namespace of the current Clojure buffer."
+  (let ((regexp clojurescript-namespace-name-regex))
+    (save-restriction
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward regexp nil t)
+          (match-string-no-properties 4))))))
+
+(defun clojurescript-repl-set-ns ()
+  (comint-send-string clojurescript-repl-buffer-name
+                      (format "(in-ns '%s)" (clojurescript-find-ns))))
+
 (defun define-keys ()
   (use-local-map clojurescript-mode-map)
-  (define-key clojurescript-mode-map (kbd "C-c C-z") 'clojurescript-switch-to-lisp))
+  (define-key clojurescript-mode-map (kbd "C-c C-z") 'clojurescript-switch-to-lisp)
+  (define-key clojurescript-mode-map (kbd "C-c M-n") 'clojurescript-repl-set-ns))
 
 ;;;###autoload
 (define-derived-mode clojurescript-mode clojure-mode "ClojureScript"
