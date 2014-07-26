@@ -44,26 +44,25 @@
 (defcustom clojurescript-repl-type "repl-listen"
   (concat "Which ClojureScript REPL type to use. \n"
           "Valid options are: \"repl-rhino\", \"repl-listen\" and \"repl-launch <command identifier>\".\n"
-          "See lein help cljsbuild for details"
-  ))
+          "See lein help cljsbuild for details"))
 
 (defvar clojurescript-repl-buffer-name "*cljs*"
   "TODO"
-)
+  )
 
-(defun cljs-repl-command () 
-  (concat "lein trampoline cljsbuild " 
-        clojurescript-repl-type))
+(defun cljs-repl-command ()
+  (concat "lein trampoline cljsbuild "
+          clojurescript-repl-type))
 
 
-(defun setup-inf-lisp-buffer ()  
+(defun setup-inf-lisp-buffer ()
   (make-local-variable 'inferior-lisp-buffer)
   (setq inferior-lisp-buffer clojurescript-repl-buffer-name))
 
 (defun inferior-cljs (cmd &optional buffer-name)
   (interactive (list (if current-prefix-arg
-                          (read-string "Run lisp: " inferior-lisp-program)
-                              inferior-lisp-program)))
+                         (read-string "Run lisp: " inferior-lisp-program)
+                       inferior-lisp-program)))
   (let ((buffer-name (or buffer-name clojurescript-repl-buffer-name)))
     (if (not (comint-check-proc buffer-name))
         (run-proc cmd buffer-name)
@@ -77,23 +76,18 @@
 
 (defun clojurescript-switch-to-lisp ()
   (interactive)
-  (unless (get-buffer-process clojurescript-repl-buffer-name)    
+  (unless (get-buffer-process clojurescript-repl-buffer-name)
     (inferior-cljs (cljs-repl-command)))
-  
   (pop-to-buffer clojurescript-repl-buffer-name))
-
-
-
 
 (defun define-keys ()
   (use-local-map clojurescript-mode-map)
   (define-key clojurescript-mode-map (kbd "C-c C-z") 'clojurescript-switch-to-lisp))
 
-
 ;;;###autoload
 (define-derived-mode clojurescript-mode clojure-mode "ClojureScript"
   "Major mode for ClojureScript"
-  (setup-inf-lisp-buffer)        
+  (setup-inf-lisp-buffer)
   (define-keys)
   (add-hook 'inferior-lisp-mode-hook 'inf-lisp-mode-hook nil 't)
   (make-local-variable 'inferior-lisp-program)
@@ -102,7 +96,6 @@
   (when (functionp 'slime-mode)
     (slime-mode -1)))
 
-
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.cljs$" . clojurescript-mode))
 
@@ -110,12 +103,10 @@
 
 ;;Hooks
 
-
-
 (defun inf-lisp-mode-hook ()
   (let ((cur-buf (current-buffer)))
     (cond ((and (get-buffer clojurescript-repl-buffer-name)
-             (not (get-buffer-process clojurescript-repl-buffer-name)))
+                (not (get-buffer-process clojurescript-repl-buffer-name)))
            (kill-buffer clojurescript-repl-buffer-name)
            (with-current-buffer cur-buf
              (rename-buffer clojurescript-repl-buffer-name)))
@@ -127,19 +118,19 @@
              (set-process-buffer inf-lisp-proc nil)
              (kill-process inf-lisp-proc)
              (kill-buffer cur-buf))))))
-          
 
- 
-  ;;     (if (not (get-buffer clojurescript-repl-buffer-name))
-          
-  ;;                                       ;Else, repl buffer already exists and is active; use it
-  ;;       ))
-  ;; ))
+
+
+;;     (if (not (get-buffer clojurescript-repl-buffer-name))
+
+;;                                       ;Else, repl buffer already exists and is active; use it
+;;       ))
+;; ))
 
 
 ;;If it exists and doesn't have a process -- kill it and rename current
 ;;If it exists and has a process -- use it
 ;;If it doesn't exist -- rename current
-          
+
 
 ;;; clojurescript-mode.el ends here
