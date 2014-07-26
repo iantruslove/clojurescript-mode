@@ -40,6 +40,7 @@
 
 (require 'clojure-mode)
 (require 'subshell-proc)
+(require 'comint)
 
 (defcustom clojurescript-repl-type "repl-listen"
   (concat "Which ClojureScript REPL type to use. \n"
@@ -115,16 +116,17 @@
   (comint-send-string clojurescript-repl-buffer-name
                       (format "(in-ns '%s)" (clojurescript-find-ns))))
 
-(defun define-keys ()
-  (use-local-map clojurescript-mode-map)
-  (define-key clojurescript-mode-map (kbd "C-c C-z") 'clojurescript-switch-to-lisp)
-  (define-key clojurescript-mode-map (kbd "C-c M-n") 'clojurescript-repl-set-ns))
+(defvar clojurescript-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-z") 'clojurescript-switch-to-lisp)
+    (define-key map (kbd "C-c M-n") (lambda () (interactive) (clojurescript-repl-set-ns)))
+    map))
 
 ;;;###autoload
 (define-derived-mode clojurescript-mode clojure-mode "ClojureScript"
   "Major mode for ClojureScript"
   (setup-inf-lisp-buffer)
-  (define-keys)
+  clojurescript-mode-map
   (add-hook 'inferior-lisp-mode-hook 'inf-lisp-mode-hook nil 't)
   (make-local-variable 'inferior-lisp-program)
   (setq inferior-lisp-program (cljs-repl-command))
