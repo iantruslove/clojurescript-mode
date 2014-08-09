@@ -12,8 +12,6 @@ work.
 * `C-c M-n` switches the REPL namespace to that of the current file.
 * `C-c C-e` evaluates the preceding s-expression.
 
-This does NOT in any way use SLIME, sadly.
-
 Requires subshell-proc and clojure-mode. Load it into your init.el
 with something like:
 
@@ -28,6 +26,4 @@ Assumes you've got both lein and cljsbuild already set up (if not, see
 https://github.com/emezeske/lein-cljsbuild).
 
 "Forked" from http://marmalade-repo.org/packages/clojurescript-mode.
-The original author, rubbish (Luke Amdor), seems to have deleted the
-repo, so I just started hacking on the source from marmalade)
 
