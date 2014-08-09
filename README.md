@@ -7,12 +7,22 @@ inferior-lisp processes in "\*inferior-lisp\*", it starts them in
 "\*cljs\*". All repl evaluation functions from clojure mode should
 work.
 
-* `C-c C-z` jumps to the REPL buffer (creating a REPL process as
+* `C-c z` jumps to the REPL buffer (creating a REPL process as
   necessary).
 * `C-c M-n` switches the REPL namespace to that of the current file.
 * `C-c C-e` evaluates the preceding s-expression.
 
 This does NOT in any way use SLIME, sadly.
+
+Requires subshell-proc and clojure-mode. Load it into your init.el
+with something like:
+
+````elisp
+(require-package 'subshell-proc)
+(require 'clojurescript-mode)
+
+(add-to-list 'auto-mode-alist '("\.cljs$" . clojurescript-mode))
+```
 
 Assumes you've got both lein and cljsbuild already set up (if not, see
 https://github.com/emezeske/lein-cljsbuild).
